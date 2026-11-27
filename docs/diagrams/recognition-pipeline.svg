@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="560" viewBox="0 0 1440 560" font-family="'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1019"/>
+      <stop offset="1" stop-color="#070b12"/>
+    </linearGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="560" fill="url(#bg)"/>
+  <text x="720" y="40" text-anchor="middle" font-size="23" font-weight="700" fill="#f8fafc">Face Recognition Pipeline</text>
+  <text x="720" y="64" text-anchor="middle" font-size="12.5" fill="#64748b">Frame in → identity + liveness out · UNKNOWN faces are tagged, never saved</text>
+
+  <!-- stages -->
+  <g>
+    <!-- 1 capture -->
+    <rect x="40" y="120" width="196" height="150" rx="10" fill="#0e1522" stroke="#22d3ee"/>
+    <text x="138" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="#67e8f9">1 · Capture</text>
+    <g font-size="10.5" fill="#94a3b8">
+      <text x="54" y="170">decode RTSP / MJPEG / webcam</text>
+      <text x="54" y="188">latest-frame share</text>
+      <text x="54" y="234" fill="#64748b">↓ BGR frame</text>
+    </g>
+
+    <!-- 2 detect -->
+    <rect x="296" y="120" width="196" height="150" rx="10" fill="#0e1522" stroke="#22d3ee"/>
+    <text x="394" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="#67e8f9">2 · Detect Faces</text>
+    <g font-size="10.5" fill="#94a3b8">
+      <text x="310" y="170">SCRFD-500M (ONNX)</text>
+      <text x="310" y="188">multi-scale · fast</text>
+      <text x="310" y="206">dlib-HOG fallback</text>
+      <text x="310" y="234" fill="#64748b">boxes + landmarks</text>
+    </g>
+
+    <!-- 3 track -->
+    <rect x="552" y="120" width="196" height="150" rx="10" fill="#0e1522" stroke="#22d3ee"/>
+    <text x="650" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="#67e8f9">3 · Track</text>
+    <g font-size="10.5" fill="#94a3b8">
+      <text x="566" y="170">IoU frame-to-frame</text>
+      <text x="566" y="188">persistent per-person</text>
+      <text x="566" y="206">re-embed on timer or new</text>
+      <text x="566" y="234" fill="#67e8f9">stable identity over time</text>
+    </g>
+
+    <!-- 4 anti-spoof -->
+    <rect x="808" y="120" width="196" height="150" rx="10" fill="#0e1522" stroke="#34d399"/>
+    <text x="906" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="#6ee7b7">4 · Anti-Spoof</text>
+    <g font-size="10.5" fill="#94a3b8">
+      <text x="822" y="170">liveness score from</text>
+      <text x="822" y="188">face texture / Laplacian</text>
+      <text x="822" y="206">CNN model roadmap</text>
+      <text x="822" y="234" fill="#34d399">live / spoof flag</text>
+    </g>
+
+    <!-- 5 embed -->
+    <rect x="1064" y="120" width="196" height="150" rx="10" fill="#0e1522" stroke="#818cf8"/>
+    <text x="1162" y="146" text-anchor="middle" font-size="13" font-weight="700" fill="#c7d2fe">5 · Embed</text>
+    <g font-size="10.5" fill="#94a3b8">
+      <text x="1078" y="170">ArcFace alignment</text>
+      <text x="1078" y="188">w600k_mbf (512-d)</text>
+      <text x="1078" y="206">dlib OpenFace (128-d)</text>
+      <text x="1078" y="234" fill="#818cf8">normalized vector</text>
+    </g>
+
+    <!-- 6 match -->
+    <rect x="1308" y="120" width="96" height="150" rx="10" fill="#0e1522" stroke="#f59e0b"/>
+    <text x="1356" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#fcd34d">6 · Match</text>
+    <g font-size="10.5" fill="#94a3b8">
+      <text x="1326" y="170">Chroma</text>
+      <text x="1326" y="188">top-N</text>
+      <text x="1326" y="206">cosine</text>
+      <text x="1326" y="234" fill="#f59e0b">≤ thr</text>
+    </g>
+  </g>
+
+  <!-- arrows between stages -->
+  <line x1="236" y1="195" x2="294" y2="195" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="492" y1="195" x2="550" y2="195" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="748" y1="195" x2="806" y2="195" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="1004" y1="195" x2="1062" y2="195" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+  <line x1="260" y1="270" x2="1355" y2="270" stroke="#64748b" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <!-- decision lane -->
+  <g>
+    <rect x="40" y="300" width="1380" height="120" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="60" y="328" font-size="13.5" font-weight="700" fill="#f8fafc">Decision &amp; Label</text>
+    <rect x="60" y="344" width="320" height="58" rx="8" fill="#141d2e" stroke="#34d399"/>
+    <text x="80" y="366" font-size="11.5" fill="#6ee7b7">distance ≤ FACE_DISTANCE_THRESHOLD (0.60)</text>
+    <text x="80" y="384" font-size="10.5" fill="#64748b">KNOWN : name · confidence = (1 − d)×100</text>
+    <rect x="400" y="344" width="320" height="58" rx="8" fill="#141d2e" stroke="#f59e0b"/>
+    <text x="420" y="366" font-size="11.5" fill="#fcd34d">distance &gt; threshold</text>
+    <text x="420" y="384" font-size="10.5" fill="#64748b">UNKNOWN : tagged on-frame, never stored</text>
+    <rect x="740" y="344" width="320" height="58" rx="8" fill="#141d2e" stroke="#fb7185"/>
+    <text x="760" y="366" font-size="11.5" fill="#fda4af">liveness &lt; ANTI_SPOOF_THRESHOLD</text>
+    <text x="760" y="384" font-size="10.5" fill="#64748b">SPOOF SUSPECT : shown in red</text>
+    <rect x="1080" y="344" width="340" height="58" rx="8" fill="#141d2e" stroke="#818cf8"/>
+    <text x="1096" y="366" font-size="11.5" fill="#c7d2fe">matched KNOWN + live</text>
+    <text x="1096" y="384" font-size="10.5" fill="#64748b">gate in/out · occupancy · behavior logging</text>
+  </g>
+
+  <!-- persistence row -->
+  <g>
+    <rect x="60" y="444" width="200" height="34" rx="6" fill="#101720" stroke="#22d3ee"/>
+    <text x="160" y="466" text-anchor="middle" font-size="11" fill="#67e8f9">Chroma: face_embeddings</text>
+    <rect x="280" y="444" width="200" height="34" rx="6" fill="#101720" stroke="#34d399"/>
+    <text x="380" y="466" text-anchor="middle" font-size="11" fill="#6ee7b7">SQLite: attendance_log</text>
+    <rect x="500" y="444" width="200" height="34" rx="6" fill="#101720" stroke="#f59e0b"/>
+    <text x="600" y="466" text-anchor="middle" font-size="11" fill="#fcd34d">productivity · health</text>
+    <rect x="720" y="444" width="220" height="34" rx="6" fill="#101720" stroke="#fb7185"/>
+    <text x="830" y="466" text-anchor="middle" font-size="11" fill="#fda4af">incident_alerts (UNKNOWN×…)</text>
+    <rect x="960" y="444" width="220" height="34" rx="6" fill="#101720" stroke="#a78bfa"/>
+    <text x="1070" y="466" text-anchor="middle" font-size="11" fill="#c4b5fd">spatial asset memory</text>
+    <rect x="1200" y="444" width="220" height="34" rx="6" fill="#101720" stroke="#818cf8"/>
+    <text x="1310" y="466" text-anchor="middle" font-size="11" fill="#c7d2fe">WS broadcast + push</text>
+  </g>
+
+  <!-- key metrics -->
+  <g font-size="11" fill="#64748b">
+    <rect x="40" y="500" width="1360" height="3" rx="1.5" fill="#1e293b"/>
+    <text x="720" y="522" text-anchor="middle" font-size="10.5">SCRFD detect → IoU track → liveness gate → ArcFace embed → top-N cosine match</text>
+    <text x="720" y="542" text-anchor="middle" font-size="10.5">Recognition backend switchable via FACE_BACKEND (auto / insightface / legacy)</text>
+  </g>
+</svg>

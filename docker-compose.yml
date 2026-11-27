@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: aegisvision-backend
+    env_file:
+      - ./backend/.env.example
+    environment:
+      - DATA_DIR=/data
+      - VECTOR_DB_DIR=/data/vector_db
+      - KNOWN_PERSONS_DIR=/data/known_persons
+      - LOGS_DIR=/data/logs
+      - SNAPSHOTS_DIR=/data/snapshots
+      - SQLITE_URL=sqlite:////data/surveillance.db
+      - SERVE_FRONTEND=true
+      - FRONTEND_DIST=/frontend
+    volumes:
+      - aegisvision_data:/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  aegisvision_data:

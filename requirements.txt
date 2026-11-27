@@ -1,0 +1,3 @@
+# Install the complete backend and test dependency set from the repository root.
+-r backend/requirements.txt
+

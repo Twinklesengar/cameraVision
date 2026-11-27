@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="920" viewBox="0 0 1440 920" font-family="'Segoe UI', system-ui, -apple-system, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1019"/>
+      <stop offset="1" stop-color="#070b12"/>
+    </linearGradient>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#22d3ee"/>
+    </marker>
+  </defs>
+
+  <rect width="1440" height="920" fill="url(#bg)"/>
+
+  <!-- Title -->
+  <text x="720" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#f8fafc">AegisVision — System Architecture</text>
+  <text x="720" y="64" text-anchor="middle" font-size="12.5" fill="#64748b">Plug-and-play, multi-camera AI surveillance &amp; behavioral-monitoring platform</text>
+
+  <!-- ================= ROW 1 : SOURCES ================= -->
+  <g>
+    <rect x="40" y="96" width="380" height="176" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="60" y="122" font-size="14" font-weight="700" fill="#f8fafc">Edge / CCTV / Webcam Sources</text>
+    <g font-size="11.5" fill="#94a3b8">
+      <text x="60" y="146">• RTSP IP cameras · hardware encoders</text>
+      <text x="60" y="166">• MJPEG / HLS / USB webcams</text>
+      <text x="60" y="186">• config-driven · auto-reconnect</text>
+    </g>
+    <rect x="60" y="200" width="340" height="52" rx="8" fill="#141d2e" stroke="#22d3ee" stroke-dasharray="4 3"/>
+    <text x="230" y="219" text-anchor="middle" font-size="11" fill="#67e8f9">cam_entrance · cam_workspace · cam_restricted</text>
+    <text x="230" y="235" text-anchor="middle" font-size="10.5" fill="#475569">gate · productivity · restricted</text>
+  </g>
+
+  <line x1="420" y1="184" x2="496" y2="184" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- ================= ROW 1 : WORKERS ================= -->
+  <g>
+    <rect x="502" y="96" width="330" height="176" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="667" y="122" text-anchor="middle" font-size="14" font-weight="700" fill="#f8fafc">Camera Worker Pool</text>
+    <g font-size="11.5" fill="#94a3b8">
+      <text x="520" y="146">One background capture thread per source</text>
+      <text x="520" y="166">latest-frame sharing · back-pressure</text>
+    </g>
+    <rect x="520" y="184" width="294" height="52" rx="6" fill="#141d2e" stroke="#818cf8"/>
+    <text x="667" y="204" text-anchor="middle" font-size="11.5" fill="#c7d2fe">/api/stream/video_feed · snapshot</text>
+    <text x="667" y="224" text-anchor="middle" font-size="11.5" fill="#c7d2fe">/api/stream/ws · fleet · clips</text>
+  </g>
+
+  <line x1="832" y1="184" x2="906" y2="184" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- ================= ROW 1 : PIPELINE ================= -->
+  <g>
+    <rect x="912" y="88" width="488" height="192" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="1156" y="114" text-anchor="middle" font-size="14" font-weight="700" fill="#f8fafc">Frame Pipeline (per camera)</text>
+    <g>
+      <rect x="928" y="128" width="88" height="40" rx="6" fill="#0b1019" stroke="#22d3ee"/>
+      <text x="971" y="147" text-anchor="middle" font-size="11.5" fill="#67e8f9">Detect</text>
+      <text x="971" y="163" text-anchor="middle" font-size="9.5" fill="#475569">SCRFD</text>
+      <rect x="1024" y="128" width="88" height="40" rx="6" fill="#0b1019" stroke="#22d3ee"/>
+      <text x="1068" y="147" text-anchor="middle" font-size="11.5" fill="#67e8f9">Track</text>
+      <text x="1068" y="163" text-anchor="middle" font-size="9.5" fill="#475569">IoU</text>
+      <rect x="1122" y="128" width="88" height="40" rx="6" fill="#0b1019" stroke="#34d399"/>
+      <text x="1166" y="147" text-anchor="middle" font-size="11.5" fill="#6ee7b7">Anti-spoof</text>
+      <text x="1166" y="163" text-anchor="middle" font-size="9.5" fill="#475569">liveness</text>
+      <rect x="1220" y="128" width="84" height="40" rx="6" fill="#0b1019" stroke="#818cf8"/>
+      <text x="1262" y="147" text-anchor="middle" font-size="11.5" fill="#c7d2fe">Embed</text>
+      <text x="1262" y="163" text-anchor="middle" font-size="9.5" fill="#475569">ArcFace 512-d</text>
+      <rect x="1314" y="128" width="72" height="40" rx="6" fill="#0b1019" stroke="#f59e0b"/>
+      <text x="1350" y="147" text-anchor="middle" font-size="11.5" fill="#fcd34d">Match</text>
+      <text x="1350" y="163" text-anchor="middle" font-size="9.5" fill="#475569">top-N</text>
+    </g>
+    <g font-size="10.5" fill="#64748b">
+      <text x="926" y="194">backend: <tspan fill="#67e8f9">insightface/ONNX</tspan> (auto) · <tspan fill="#94a3b8">dlib</tspan> fallback</text>
+      <text x="926" y="210">embed dims <tspan fill="#818cf8">512</tspan> vs <tspan fill="#94a3b8">128</tspan> → vector index self-heals</text>
+      <text x="926" y="226">UNKNOWN ⇒ <tspan fill="#fb7185">no file written</tspan>, red on-frame tag</text>
+    </g>
+    <rect x="926" y="236" width="460" height="28" rx="6" fill="#101720" stroke="#1e293b"/>
+    <text x="1156" y="255" text-anchor="middle" font-size="10.5" fill="#64748b">identity + liveness + events → behavioral engines</text>
+  </g>
+
+  <!-- arrows row1 -> row2 -->
+  <line x1="400" y1="280" x2="400" y2="318" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- ================= ROW 2 : ENGINES ================= -->
+  <g>
+    <rect x="40" y="320" width="560" height="300" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="60" y="348" font-size="14" font-weight="700" fill="#f8fafc">Behavioral Engines</text>
+    <rect x="60" y="362" width="520" height="56" rx="8" fill="#141d2e" stroke="#34d399"/>
+    <text x="76" y="382" font-size="12.5" font-weight="700" fill="#6ee7b7">Attendance &amp; Gate Zones</text>
+    <text x="76" y="400" font-size="11" fill="#94a3b8">in/out line-crossing · live occupancy · 30 s cooldown per person per camera</text>
+    <rect x="60" y="428" width="520" height="56" rx="8" fill="#141d2e" stroke="#f59e0b"/>
+    <text x="76" y="448" font-size="12.5" font-weight="700" fill="#fcd34d">Productivity State Machine</text>
+    <text x="76" y="466" font-size="11" fill="#94a3b8">active · idle/lazy · bunking · phone-distraction windows</text>
+    <rect x="60" y="494" width="520" height="56" rx="8" fill="#141d2e" stroke="#fb7185"/>
+    <text x="76" y="514" font-size="12.5" font-weight="700" fill="#fda4af">Health &amp; Safety Sentinel</text>
+    <text x="76" y="532" font-size="11" fill="#94a3b8">drowsiness · fatigue · posture · fall risk</text>
+    <rect x="60" y="560" width="520" height="56" rx="8" fill="#141d2e" stroke="#a78bfa"/>
+    <text x="76" y="580" font-size="12.5" font-weight="700" fill="#c4b5fd">Spatial / Anti-Theft Memory</text>
+    <text x="76" y="598" font-size="11" fill="#94a3b8">asset registry · displacement vs owner · UNKNOWN near asset ⇒ THEFT_SUSPECTED</text>
+  </g>
+
+  <!-- ================= ROW 2 : DATA ================= -->
+  <g>
+    <rect x="640" y="320" width="360" height="300" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="660" y="348" font-size="14" font-weight="700" fill="#f8fafc">Single Source of Truth</text>
+    <rect x="660" y="368" width="320" height="116" rx="8" fill="#101720" stroke="#22d3ee"/>
+    <text x="676" y="390" font-size="12.5" font-weight="700" fill="#67e8f9">ChromaDB · vector index (n-dim cosine)</text>
+    <g font-size="11" fill="#94a3b8">
+      <text x="676" y="412">face_embeddings — one vector per photo</text>
+      <text x="676" y="432">top-N nearest · distance threshold gating</text>
+      <text x="676" y="452">self-healing rebuild on backend dimension change</text>
+    </g>
+    <rect x="660" y="496" width="320" height="118" rx="8" fill="#101720" stroke="#34d399"/>
+    <text x="676" y="518" font-size="12.5" font-weight="700" fill="#6ee7b7">SQLite · relational</text>
+    <g font-size="11" fill="#94a3b8">
+      <text x="676" y="540">personnel · attendance_log · productivity_log</text>
+      <text x="676" y="560">health_log · asset_log · incident_alerts</text>
+      <text x="676" y="580">kept in sync with the vector index</text>
+    </g>
+  </g>
+
+  <!-- ================= ROW 2 : RULES + PUSH ================= -->
+  <g>
+    <rect x="1040" y="322" width="360" height="326" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="1200" y="350" text-anchor="middle" font-size="14" font-weight="700" fill="#f8fafc">Alerts &amp; Push</text>
+    <rect x="1056" y="366" width="288" height="58" rx="8" fill="#141d2e" stroke="#fb7185"/>
+    <text x="1200" y="388" text-anchor="middle" font-size="12" fill="#fda4af">Rule Engine</text>
+    <text x="1200" y="406" text-anchor="middle" font-size="10.5" fill="#64748b">UNKNOWN×3 · phone ×3 · drowsy</text>
+    <rect x="1056" y="436" width="288" height="58" rx="8" fill="#141d2e" stroke="#f59e0b"/>
+    <text x="1200" y="458" text-anchor="middle" font-size="12" fill="#fcd34d">Alert Dispatcher</text>
+    <text x="1200" y="476" text-anchor="middle" font-size="10.5" fill="#64748b">WebSocket broadcast</text>
+    <rect x="1056" y="506" width="288" height="58" rx="8" fill="#141d2e" stroke="#818cf8"/>
+    <text x="1200" y="528" text-anchor="middle" font-size="12" fill="#c7d2fe">Push Providers</text>
+    <text x="1200" y="546" text-anchor="middle" font-size="10.5" fill="#64748b">Telegram bot · JSON webhook</text>
+    <rect x="1056" y="576" width="288" height="58" rx="8" fill="#141d2e" stroke="#a78bfa"/>
+    <text x="1200" y="598" text-anchor="middle" font-size="12" fill="#c4b5fd">GenAI Copilot</text>
+    <text x="1200" y="616" text-anchor="middle" font-size="10.5" fill="#64748b">natural-language · rule fallback</text>
+  </g>
+
+  <!-- engines -> data -->
+  <path d="M 320 620 L 780 640" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+  <!-- engines -> rules -->
+  <path d="M 600 560 L 1040 460" stroke="#64748b" stroke-width="2" marker-end="url(#arr)" stroke-dasharray="5 4"/>
+
+  <!-- ================= ROW 3 : API ================= -->
+  <g>
+    <rect x="40" y="660" width="760" height="200" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="60" y="688" font-size="14" font-weight="700" fill="#f8fafc">FastAPI Backend Layer</text>
+    <g font-size="11" fill="#94a3b8">
+      <text x="60" y="712">• REST /api groups: personnel · analytics · alerts · assets</text>
+      <text x="60" y="730">• copilot · system · auth (JWT) · metrics</text>
+      <text x="60" y="748">• MJPEG video feeds + WebSocket event stream</text>
+      <text x="60" y="766">• Pydantic-typed request/response schemas</text>
+    </g>
+    <rect x="60" y="780" width="220" height="34" rx="6" fill="#101720" stroke="#22d3ee"/>
+    <text x="170" y="802" text-anchor="middle" font-size="11" fill="#67e8f9">REST /api/*</text>
+    <rect x="300" y="780" width="220" height="34" rx="6" fill="#101720" stroke="#34d399"/>
+    <text x="410" y="802" text-anchor="middle" font-size="11" fill="#6ee7b7">WS /api/stream/ws</text>
+    <rect x="540" y="780" width="240" height="34" rx="6" fill="#101720" stroke="#818cf8"/>
+    <text x="660" y="802" text-anchor="middle" font-size="11" fill="#c7d2fe">Auth · RBAC · health · logs</text>
+  </g>
+
+  <!-- ================= ROW 3 : REACT ================= -->
+  <g>
+    <rect x="820" y="660" width="580" height="224" rx="12" fill="#0e1522" stroke="#334155"/>
+    <text x="1060" y="688" text-anchor="middle" font-size="14" font-weight="700" fill="#f8fafc">Web Command Center</text>
+    <rect x="844" y="704" width="152" height="44" rx="8" fill="#141d2e" stroke="#22d3ee"/>
+    <text x="920" y="724" text-anchor="middle" font-size="11" fill="#67e8f9">Live grid</text>
+    <text x="920" y="740" text-anchor="middle" font-size="10" fill="#475569">Multi-camera</text>
+    <rect x="1012" y="704" width="152" height="44" rx="8" fill="#141d2e" stroke="#34d399"/>
+    <text x="1088" y="724" text-anchor="middle" font-size="11" fill="#6ee7b7">Personnel</text>
+    <text x="1088" y="740" text-anchor="middle" font-size="10" fill="#475569">Roster · assign</text>
+    <rect x="1180" y="704" width="124" height="44" rx="8" fill="#141d2e" stroke="#f59e0b"/>
+    <text x="1242" y="724" text-anchor="middle" font-size="11" fill="#fcd34d">Analytics</text>
+    <text x="1242" y="740" text-anchor="middle" font-size="10" fill="#475569">Productivity</text>
+    <rect x="844" y="764" width="152" height="44" rx="8" fill="#141d2e" stroke="#fb7185"/>
+    <text x="920" y="784" text-anchor="middle" font-size="11" fill="#fda4af">Incidents</text>
+    <text x="920" y="800" text-anchor="middle" font-size="10" fill="#475569">Live alerts</text>
+    <rect x="1012" y="764" width="152" height="44" rx="8" fill="#141d2e" stroke="#a78bfa"/>
+    <text x="1088" y="784" text-anchor="middle" font-size="11" fill="#c4b5fd">Health</text>
+    <text x="1088" y="800" text-anchor="middle" font-size="10" fill="#475569">Sentinel</text>
+    <rect x="1180" y="764" width="124" height="44" rx="8" fill="#141d2e" stroke="#22d3ee"/>
+    <text x="1242" y="784" text-anchor="middle" font-size="11" fill="#67e8f9">Spatial</text>
+    <text x="1242" y="800" text-anchor="middle" font-size="10" fill="#475569">Assets</text>
+    <rect x="844" y="824" width="460" height="40" rx="8" fill="#141d2e" stroke="#818cf8"/>
+    <text x="1074" y="849" text-anchor="middle" font-size="11.5" fill="#c7d2fe">Copilot · attendance view · system</text>
+    <g font-size="10.5" fill="#64748b">
+      <text x="844" y="886">5 s polling + WebSocket alert feed</text>
+      <text x="844" y="904">VITE_API_BASE env · no hardcoded hosts</text>
+    </g>
+  </g>
+
+  <line x1="800" y1="780" x2="838" y2="780" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- bottom legend -->
+  <g transform="translate(40,896)">
+    <rect width="1360" height="3" rx="1.5" fill="url(#accA)" opacity="0.4"/>
+    <text x="720" y="18" text-anchor="middle" font-size="10.5" fill="#475569">FastAPI + ChromaDB + SQLite · OpenCV + insightface/ONNX · Tailwind · WebSocket · Telegram/Webhook notifications</text>
+  </g>
+</svg>

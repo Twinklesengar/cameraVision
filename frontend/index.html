@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { 900: '#070b12', 850: '#0b1019', 800: '#0e1522', 700: '#141d2e' },
+          },
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'], mono: ['JetBrains Mono', 'ui-monospace'] },
+        },
+      },
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body class="min-h-screen bg-ink-900 text-gray-200 antialiased">
+
+  <div id="app" class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-60 bg-ink-850 border-r border-white/5 flex-col transition-transform -translate-x-full lg:translate-x-0 lg:flex">
+      <div class="flex items-center gap-2.5 px-5 h-[64px] border-b border-white/5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 grid place-items-center shadow-lg shadow-cyan-500/25">
+          <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 12a8 8 0 0 1 8 8v2H4v-2a8 8 0 0 1 8-8z" />
+            <circle cx="12" cy="11" r="1" />
+          </svg>
+        </div>
+        <div>
+          <div class="text-[15px] font-extrabold text-white leading-none">CameraVision</div>
+          <div class="text-[10px] text-gray-400 font-mono mt-0.5" id="sidebar-ver">v3.0</div>
+        </div>
+      </div>
+
+      <nav id="nav" class="flex-1 overflow-y-auto py-3 px-3 space-y-1"></nav>
+
+      <div class="px-4 py-4 border-t border-white/5">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-indigo-500/30 grid place-items-center text-indigo-200 font-bold text-sm" id="user-avatar">A</div>
+          <div class="min-w-0 flex-1">
+            <div class="text-sm font-semibold text-white truncate" id="user-name">operator</div>
+            <div class="text-[10px] font-mono text-cyan-300" id="user-role"></div>
+          </div>
+          <button id="logout-btn" title="Sign out" class="text-gray-400 hover:text-rose-300 transition-colors">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main column -->
+    <div class="flex-1 lg:pl-64 flex flex-col min-h-screen">
+      <!-- Topbar -->
+      <header class="sticky top-0 z-30 h-[64px] bg-ink-850/80 backdrop-blur-md border-b border-white/5 flex items-center px-4 lg:px-6 gap-4">
+        <button id="menu-btn" class="lg:hidden text-gray-300 hover:text-white">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <h1 id="view-title" class="text-lg font-bold text-white -mb-0.5">Command Center</h1>
+          <p id="view-subtitle" class="text-[11px] text-gray-400"></p>
+        </div>
+
+        <div class="flex-1"></div>
+
+        <div class="hidden md:flex items-center gap-2 text-[11px] font-mono text-gray-400">
+          <span id="ws-dot" class="w-2 h-2 rounded-full bg-gray-600"></span>
+          <span id="ws-status">connecting…</span>
+        </div>
+
+        <input id="search-input" placeholder="Search personnel / incidents…  ( / )"
+          class="hidden sm:block w-64 px-3 py-2 rounded-xl bg-ink-800 border border-white/10 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400/50" />
+        <div id="clock" class="text-sm font-mono text-cyan-300 tabular-nums hidden sm:block"></div>
+      </header>
+
+      <!-- View container -->
+      <main id="view" class="flex-1 px-4 lg:px-6 py-6"></main><footer class="px-6 py-4 text-[11px] text-gray-500 text-center border-t border-white/5">
+        UNKNOWN faces are never written to disk · WebSocket live incident feed
+      </footer>
+    </div>
+  </div>
+
+  <!-- Search overlay -->
+  <div id="search-overlay" class="hidden fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="search-backdrop"></div>
+    <div class="relative max-w-xl mx-auto mt-24 px-4">
+      <div class="glass-card rounded-2xl overflow-hidden">
+        <input id="search-input-overlay" autocomplete="off" placeholder="Search personnel or incidents…  Press Esc to close"
+          class="w-full px-4 py-3.5 bg-ink-800/80 text-sm text-white placeholder-gray-500 focus:outline-none border-b border-white/5" />
+        <div id="search-results" class="max-h-80 overflow-y-auto divide-y divide-white/5"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toasts" class="fixed bottom-4 right-4 z-50 space-y-2 w-80 max-w-[calc(100vw-2rem)]"></div>
+
+  <template id="nav-item">
+    <a class="nav-link flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all">
+      <span class="nav-icon grid place-items-center w-6"></span>
+      <span class="nav-label"></span>
+      <span class="nav-badge ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 hidden"></span>
+    </a>
+  </template>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/views/dashboard.js"></script>
+  <script src="/js/views/live.js"></script>
+  <script src="/js/views/attendance.js"></script>
+  <script src="/js/views/productivity.js"></script>
+  <script src="/js/views/health.js"></script>
+  <script src="/js/views/assets.js"></script>
+  <script src="/js/views/incidents.js"></script>
+  <script src="/js/views/copilot.js"></script>
+  <script src="/js/views/analytics.js"></script>
+  <script src="/js/views/personnel.js"></script>
+  <script src="/js/views/system.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>
